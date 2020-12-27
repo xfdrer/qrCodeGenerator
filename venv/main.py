@@ -2,15 +2,18 @@
 
 import os
 import tempfile
+import csv
 import zipfile
 import tkinter as tk
 from tkinter import filedialog
+import qrcode
 
 class CreateWindow:
     csvPath = ''
     root = None
     canvas1 = None
     tmpDir = ''
+    csvData = {}
 
     def __init__(self):
         self.tmpDir = tempfile.gettempdir()
@@ -38,7 +41,8 @@ class CreateWindow:
         return fn
 
     def generateQR(self):
-        self.makeTmpDir()
+        tmpDir = self.makeTmpDir()
+        self.parseCSV()
 
     def makeTmpDir(self):
         tmpName = os.path.basename(self.csvPath)
@@ -46,6 +50,21 @@ class CreateWindow:
         if os.path.exists(tmpDirPath) is False:
             os.rmdir(tmpDirPath)
         os.mkdir(tmpDirPath)
+        return tmpDirPath
+
+    def parseCSV(self):
+        with open(self.csvPath) as csv_file:
+            csvReader = csv.reader(csv_file, delimiter=',')
+            lineCount = 1
+            for row in csvReader:
+                if lineCount > 0:
+                    self.csvData[lineCount] = {
+                        'fileName': row[0],
+                        'value': row[1]
+                    }
+                    lineCount += 1
+
+
 
 
 cl = CreateWindow()
